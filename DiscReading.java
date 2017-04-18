@@ -64,7 +64,7 @@ public class DiscReading
 
 		System.out.println("---FCFS ALGORITHM---");
 		System.out.println("FCFS total seek time: " + seekTime);
-		averageSeek = seekTime / (queue.length);
+		averageSeek = seekTime / (queue.length + 1);
 		System.out.println("FCFS average seek time: " + averageSeek + "\n");
 	}
 
@@ -88,12 +88,36 @@ public class DiscReading
 
 		System.out.println("---SSTF ALGORITHM---");
 		System.out.println("SSTF total seek time: " + seekTime);
-		averageSeek = seekTime / queue.length;
+		averageSeek = seekTime / (queue.length + 1);
 		System.out.println("SSTF average seek time: " + averageSeek + "\n");
 	}
 
 	public void lookAlgorithm() {
+		// seekTime = 0;
+		// int[] tmpQueue = new int[queue.length];
+		// int index;
+		// int start = head;
 
+		// for(int i = 0; i < queue.length; i++) {
+		// 	System.out.println(queue[i] + "-->");
+		// 	if(queue[i+1] > queue[i] && i+1 != queue.length+1) {
+		// 		seekTime = seekTime + queue[i+1] - queue[i];
+		// 	} else if(queue[i+1] <= queue[i] && i+1 != k) {
+
+		// 	}
+		// }
+
+
+
+
+
+
+
+
+		// System.out.println("---LOOK ALGORITHM---");
+		// System.out.println("LOOK total seek time: " + seekTime);
+		// averageSeek = seekTime / queue.length;
+		// System.out.println("LOOK average seek time: " + averageSeek + "\n");
 	}
 
 	public void clookAlgorithm() {
@@ -120,17 +144,19 @@ public class DiscReading
 			// System.out.println("Move from " + queue[i] + " to " + queue[i+1] + " with distance " + distance);
 		}
 
-		System.out.println("---CLOOK ALGORITHM---");
-		System.out.println("CLOOK total seek time: " + seekTime);
-		averageSeek = seekTime / queue.length;
-		System.out.println("CLOOK average seek time: " + averageSeek + "\n");
+		// System.out.println("---CLOOK ALGORITHM---");
+		// System.out.println("CLOOK total seek time: " + seekTime);
+		// averageSeek = seekTime / queue.length;
+		// System.out.println("CLOOK average seek time: " + averageSeek + "\n");
 	}
 
 	public void scanAlgorithm() {
 		seekTime = 0;
-		int[] tmpQueue = new int[queue.length];
+		int[] tmpQueue = new int[queue.length + 1];
 		int index = -1;
 		int start = head;
+
+		tmpQueue[queue.length] = start;
 
 		for(int i = 0; i < queue.length; i++) {
 			tmpQueue[i] = queue[i];
@@ -138,31 +164,36 @@ public class DiscReading
 
 		sortQueue(tmpQueue);
 
-		for(int i=0; i < queue.length; i++) {
-			if(start > tmpQueue[i]) { 
-				index = i; 
-				break;  
+		for(int i = 0; i < tmpQueue.length; i++) {
+			if(start == tmpQueue[i]) { 
+				index = i;
 			}
 		}
-		for(int i = index; i >= 0; i--) {
-			System.out.print(" --> " + tmpQueue[i]);
-		}
-		System.out.print("0 --> ");
-		for(int i = index+1; i < queue.length; i++) {
-			System.out.print("--> " + tmpQueue[i]);
+
+		for(int i = index; i > 0; i--) {
+			seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
 		}
 		
-		// seekTime = start + max;
-		System.out.println("---SCAN ALGORITHM---");
-		// System.out.println("\nmovement of total cylinders: " + seekTime);
+		// reading to the left: 0
+		seekTime = seekTime + Math.abs(tmpQueue[0] - 0);
+		seekTime = seekTime + Math.abs(tmpQueue[index+1] - 0);
 
-		// System.out.println("---CLOOK ALGORITHM---");
-		// System.out.println("CLOOK total seek time: " + seekTime);
-		// averageSeek = seekTime / queue.length;
-		// System.out.println("CLOOK average seek time: " + averageSeek + "\n");
+		for(int i = index+1; i < tmpQueue.length - 1; i++) {
+			seekTime = seekTime + Math.abs(tmpQueue[i+1] - tmpQueue[i]);
+		}
+		
+		System.out.println("---SCAN ALGORITHM---");
+		System.out.println("SCAN total seek time: " + seekTime);
+		averageSeek = seekTime / tmpQueue.length;
+		System.out.println("SCAN average seek time: " + averageSeek + "\n");
 	}
 
 	public void cscanAlgorithm() {
+
+
+
+
+
 
 	}
 
@@ -209,8 +240,8 @@ public class DiscReading
 	public void sortQueue(int[] tmpQueue) {
 		int temp;
 
-		for(int i = 0; i < queue.length; i++) {
-			for(int j = i; j < queue.length; j++) {
+		for(int i = 0; i < tmpQueue.length; i++) {
+			for(int j = i; j < tmpQueue.length; j++) {
 				if(tmpQueue[i] > tmpQueue[j]) {
 					temp = tmpQueue[i];
 					tmpQueue[i] = tmpQueue[j];
