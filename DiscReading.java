@@ -47,7 +47,7 @@ public class DiscReading
         }
 	}
 
-	// First Come First Serve
+	// First Come First Serve algorithm
 	public void fcfsAlgorithm() {
 		seekTime = 0;
 		distance = Math.abs(queue[0] - head);
@@ -68,7 +68,7 @@ public class DiscReading
 		System.out.println("FCFS average seek time: " + averageSeek + "\n");
 	}
 
-	// Shortest Seek Time First
+	// Shortest Seek Time First algorithm
 	public void sstfAlorithm() {
 		seekTime = 0;
 		int[] tmpQueue = new int[queue.length];
@@ -92,34 +92,47 @@ public class DiscReading
 		System.out.println("SSTF average seek time: " + averageSeek + "\n");
 	}
 
+	// LOOK algorithm
 	public void lookAlgorithm() {
-		// seekTime = 0;
-		// int[] tmpQueue = new int[queue.length];
-		// int index;
-		// int start = head;
+		seekTime = 0;
+		int[] tmpQueue = new int[queue.length + 1];
+		int index = -1;
+		int start = head;
 
-		// for(int i = 0; i < queue.length; i++) {
-		// 	System.out.println(queue[i] + "-->");
-		// 	if(queue[i+1] > queue[i] && i+1 != queue.length+1) {
-		// 		seekTime = seekTime + queue[i+1] - queue[i];
-		// 	} else if(queue[i+1] <= queue[i] && i+1 != k) {
+		tmpQueue[queue.length] = start;
 
-		// 	}
-		// }
+		for(int i = 0; i < queue.length; i++) {
+			tmpQueue[i] = queue[i];
+		}
 
+		sortQueue(tmpQueue);
 
+		for(int i = 0; i < tmpQueue.length; i++) {
+			if(start == tmpQueue[i]) { 
+				index = i;
+			}
+		}
 
+		// reading to the left (descending)
+		for(int i = index; i > 0; i--) {
+			seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
+		}
 
+		// change direction
+		seekTime = seekTime + Math.abs(tmpQueue[index+1] - tmpQueue[0]);
 
+		// reading to the right (ascending)
+		for(int i = index+1; i < tmpQueue.length-1; i++) {
+			seekTime = seekTime + Math.abs(tmpQueue[i+1] - tmpQueue[i]);
+		}
 
-
-
-		// System.out.println("---LOOK ALGORITHM---");
-		// System.out.println("LOOK total seek time: " + seekTime);
-		// averageSeek = seekTime / queue.length;
-		// System.out.println("LOOK average seek time: " + averageSeek + "\n");
+		System.out.println("---LOOK ALGORITHM---");
+		System.out.println("LOOK total seek time: " + seekTime);
+		averageSeek = seekTime / tmpQueue.length;
+		System.out.println("LOOK average seek time: " + averageSeek + "\n");
 	}
 
+	// Circular LOOK algorithm 
 	public void clookAlgorithm() {
 		seekTime = 0;
 		int[] tmpQueue = new int[queue.length + 1];
@@ -239,7 +252,7 @@ public class DiscReading
 		System.out.println("C-SCAN average seek time: " + averageSeek + "\n");
 	}
 
-	// --------------------------------------------------------------------
+	// other --------------------------------------------------------------------
 	public int findShortestSeek(int[] tmpQueue, int start) {
 		int min = 999999; // large initial value to check for min
 		int index = -1;
@@ -257,28 +270,6 @@ public class DiscReading
 		return index;
 	}
 
-	public int clookSort(int[] tmpQueue, int start) {
-		int temp;
-
-		for(int i = 0; i < queue.length - 1; i++) {
-			for(int j = 0; j < queue.length - 1; j++) {
-				if(tmpQueue[j] > tmpQueue[j+1]) {
-					temp = tmpQueue[j];
-					tmpQueue[j] = tmpQueue[j+1];
-					tmpQueue[j+1] = temp;
-				}
-			}
-		}
-
-		for(int i = 0; i < queue.length; i++) {
-			if(tmpQueue[i] > start) {
-				return i;
-			}
-		}
-
-		return queue.length;
-	}
-
 	public void sortQueue(int[] tmpQueue) {
 		int temp;
 
@@ -292,14 +283,4 @@ public class DiscReading
 			}
 		}
 	}
-
-
-
-
-
-
-
-
-
-
 }
