@@ -9,18 +9,30 @@ public class DiscReading
 	public static int distance;
 	public static int seekTime;
 	public static float averageSeek;
-	public static final int DISK_SIZE = 5000;
+	public static int diskSize;
+	public static char direction;
 
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 		DiscReading disc = new DiscReading(); 
 
-		System.out.print("Enter current cylinder location (0 - 4,999): ");
+		System.out.print("Enter disk size: ");
+		diskSize = in.nextInt();
+
+		System.out.print("Enter current cylinder location: ");
 		head = in.nextInt();
 
-		while(head > DISK_SIZE || head <= 0) {
-			System.out.print("Location out of range, enter current cylinder location (0 - 4,999): ");
+		while(head > diskSize || head <= 0) {
+			System.out.print("Location out of disk size range, enter current cylinder location: ");
 			head = in.nextInt();
+		}
+
+		System.out.print("Read disk to the right or left (r/l)? ");
+		direction = in.next().charAt(0);
+
+		while(direction != 'r' && direction != 'l') {
+			System.out.print("Wrong input, read disk to the right or left (r/l)? ");
+			direction = in.next().charAt(0);
 		}
 
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("queue.txt")))) {
@@ -113,17 +125,32 @@ public class DiscReading
 			}
 		}
 
-		// reading to the left (descending)
-		for(int i = index; i > 0; i--) {
-			seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
-		}
+		if(direction == 'l') {
+			// reading to the left (descending)
+			for(int i = index; i > 0; i--) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
+			}
 
-		// change direction
-		seekTime = seekTime + Math.abs(tmpQueue[index+1] - tmpQueue[0]);
+			// change direction
+			seekTime = seekTime + Math.abs(tmpQueue[index+1] - tmpQueue[0]);
 
-		// reading to the right (ascending)
-		for(int i = index+1; i < tmpQueue.length-1; i++) {
-			seekTime = seekTime + Math.abs(tmpQueue[i+1] - tmpQueue[i]);
+			// reading to the right (ascending)
+			for(int i = index+1; i < tmpQueue.length-1; i++) {
+				seekTime = seekTime + Math.abs(tmpQueue[i+1] - tmpQueue[i]);
+			}
+		} else if (direction == 'r') {
+			// reading to the right (ascending)
+			for(int i = index; i < tmpQueue.length-1; i++) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i+1]);
+			}
+
+			// change direction
+			seekTime = seekTime + Math.abs(tmpQueue[tmpQueue.length-1] - tmpQueue[index-1]);
+
+			// reading to the left (descending)
+			for(int i = index-1; i > 0; i--) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
+			}
 		}
 
 		System.out.println("---LOOK ALGORITHM---");
@@ -153,22 +180,38 @@ public class DiscReading
 			}
 		}
 
-		// reading to the left (descending)
-		for(int i = index; i > 0; i--) {
-			seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
+		if(direction == 'l') {
+			// reading to the left (descending)
+			for(int i = index; i > 0; i--) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
+			}
+
+			// change direction
+			seekTime = seekTime + Math.abs(tmpQueue[0] - tmpQueue[tmpQueue.length-1]);
+
+			// descending again from other side
+			for(int i = tmpQueue.length - 1; i > index + 1; i--) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
+			}
+		} else if(direction == 'r') {
+			// reading to the right (ascending)
+			for (int i = index; i < tmpQueue.length-1; i++) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i+1]);
+			}
+
+			// change direction
+			seekTime = seekTime + Math.abs(tmpQueue[tmpQueue.length-1] - tmpQueue[0]);
+
+			// ascending again from the other side
+			for(int i = 0; i < index-1; i++) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i+1]);
+			}
 		}
 
-		// don't go to the end of the cylinder
-
-		// descending again from other side
-		for(int i = tmpQueue.length - 1; i > index + 1; i--) {
-			seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
-		}
-
-		System.out.println("---CLOOK ALGORITHM---");
-		System.out.println("CLOOK total seek time: " + seekTime);
+		System.out.println("---C-LOOK ALGORITHM---");
+		System.out.println("C-LOOK total seek time: " + seekTime);
 		averageSeek = seekTime / tmpQueue.length;
-		System.out.println("CLOOK average seek time: " + averageSeek + "\n");
+		System.out.println("C-LOOK average seek time: " + averageSeek + "\n");
 	}
 
 	// SCAN aka Elevator algorithm
@@ -219,7 +262,7 @@ public class DiscReading
 		int start = head;
 
 		tmpQueue[tmpQueue.length-1] = start;
-		tmpQueue[tmpQueue.length-2] = DISK_SIZE - 1;
+		tmpQueue[tmpQueue.length-2] = diskSize - 1;
 
 		for(int i = 0; i < queue.length; i++) {
 			tmpQueue[i] = queue[i];
