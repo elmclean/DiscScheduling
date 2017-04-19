@@ -308,7 +308,7 @@ public class DiscReading
 		} else if(direction == 'r') {
 			// reading to the right (ascending)
 			for(int i = index; i < tmpQueue.length-1; i++) {
-				seekTime = seekTime + Math.abs(tmpQueue[i] + tmpQueue[i+1]);
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i+1]);
 			}
 
 			// reading to the right (ascending) from 0
@@ -322,7 +322,7 @@ public class DiscReading
 
 		System.out.println("---C-SCAN ALGORITHM---");
 		System.out.println("C-SCAN total seek time: " + seekTime);
-		averageSeek = seekTime / tmpQueue.length;
+		averageSeek = seekTime / (tmpQueue.length-1);
 		System.out.println("C-SCAN average seek time: " + averageSeek + "\n");
 	}
 
