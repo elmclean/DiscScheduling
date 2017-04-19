@@ -187,7 +187,7 @@ public class DiscReading
 			}
 
 			// change direction
-			seekTime = seekTime + Math.abs(tmpQueue[0] - tmpQueue[tmpQueue.length-1]);
+			// doesn't actually count this: seekTime = seekTime + Math.abs(tmpQueue[0] - tmpQueue[tmpQueue.length-1]);
 
 			// descending again from other side
 			for(int i = tmpQueue.length - 1; i > index + 1; i--) {
@@ -200,7 +200,7 @@ public class DiscReading
 			}
 
 			// change direction
-			seekTime = seekTime + Math.abs(tmpQueue[tmpQueue.length-1] - tmpQueue[0]);
+			// doesn't actually count this: seekTime = seekTime + Math.abs(tmpQueue[tmpQueue.length-1] - tmpQueue[0]);
 
 			// ascending again from the other side
 			for(int i = 0; i < index-1; i++) {
@@ -235,17 +235,33 @@ public class DiscReading
 			}
 		}
 
-		// reading to the left (descending)
-		for(int i = index; i > 0; i--) {
-			seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
-		}
-		
-		// reading to the left (descending): 0
-		seekTime = seekTime + Math.abs(tmpQueue[0] - 0);
-		seekTime = seekTime + Math.abs(tmpQueue[index+1] - 0);
+		if(direction == 'l') {
+			// reading to the left (descending)
+			for(int i = index; i > 0; i--) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
+			}
+			
+			// reading to the left (descending): 0
+			seekTime = seekTime + Math.abs(tmpQueue[0] - 0);
+			seekTime = seekTime + Math.abs(tmpQueue[index+1] - 0);
 
-		for(int i = index+1; i < tmpQueue.length - 1; i++) {
-			seekTime = seekTime + Math.abs(tmpQueue[i+1] - tmpQueue[i]);
+			for(int i = index+1; i < tmpQueue.length - 1; i++) {
+				seekTime = seekTime + Math.abs(tmpQueue[i+1] - tmpQueue[i]);
+			}
+		} else if(direction == 'r') {
+			// reading to the right (ascending)
+			for(int i = index; i < tmpQueue.length-1; i++) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i+1]);
+			}
+
+			// reading to the right (asending): diskSize-1
+			seekTime = seekTime + Math.abs(tmpQueue[tmpQueue.length-1] - (diskSize-1));
+			seekTime = seekTime + Math.abs(0 - tmpQueue[0]);
+
+			// reading to the the right (ascending)
+			for(int i = 0; i < index-1; i++) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i+1]);
+			}
 		}
 		
 		System.out.println("---SCAN ALGORITHM---");
@@ -276,17 +292,32 @@ public class DiscReading
 			}
 		}
 
-		// reading to the left (descending)
-		for(int i = index; i > 0; i--) {
-			seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
-		}
+		if(direction == 'l') {
+			// reading to the left (descending)
+			for(int i = index; i > 0; i--) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
+			}
 
-		// reading to the left (descending): 0, then back to 4999
-		seekTime = seekTime + Math.abs(tmpQueue[0] - 0);
-		seekTime = seekTime + Math.abs(tmpQueue[tmpQueue.length-1] - 0);
+			// reading to the left (descending) to 0
+			seekTime = seekTime + Math.abs(tmpQueue[0] - 0);
 
-		for(int i = index+1; i < tmpQueue.length - 1; i++) {
-			seekTime = seekTime + Math.abs(tmpQueue[i+1] - tmpQueue[i]);
+			// reading from the left (descending) from diskSize-1
+			for(int i = tmpQueue.length-1; i > index+1; i--) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i-1]);
+			}
+		} else if(direction == 'r') {
+			// reading to the right (ascending)
+			for(int i = index; i < tmpQueue.length-1; i++) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] + tmpQueue[i+1]);
+			}
+
+			// reading to the right (ascending) from 0
+			seekTime = seekTime + Math.abs(0 - tmpQueue[0]);
+
+			// reading to the right (ascending)
+			for(int i = 0; i < index-1; i++) {
+				seekTime = seekTime + Math.abs(tmpQueue[i] - tmpQueue[i+1]);
+			}
 		}
 
 		System.out.println("---C-SCAN ALGORITHM---");
